@@ -63,25 +63,37 @@ document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
     
     // Admin Login Form Submission
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Simple authentication (replace with proper authentication)
-            if (username === 'admin' && password === 'password') {
-                // Store login status in session storage
+    // Admin Login Form Submission
+if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+            // Validate login
+            if (AdminAuth.validateLogin(username, password)) {
+                // Set login status
                 sessionStorage.setItem('adminLoggedIn', 'true');
-                showDashboard();
-                // Record login activity
-                recordActivity('login', 'Admin logged in');
+                
+                // Show dashboard
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                
+                // Record login activity (if function exists)
+                if (typeof recordActivity === 'function') {
+                    recordActivity('login', 'Admin logged in');
+                }
             } else {
+                // Show login error
                 loginError.textContent = 'Invalid username or password';
             }
-        });
-    }
+        } catch (error) {
+            loginError.textContent = error.message;
+        }
+    });
+}
     
     // Logout button
     if (logoutBtn) {
