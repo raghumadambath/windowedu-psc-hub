@@ -1,55 +1,3 @@
-// AdminAuth Utility for Cross-Browser Authentication
-const AdminAuth = {
-    // Initialize default admin credentials if not set
-    initializeAdmin() {
-        if (!localStorage.getItem('adminUsername')) {
-            this.setAdminCredentials('admin', 'password');
-        }
-    },
-
-    // Securely set admin credentials with basic hashing
-    setAdminCredentials(username, password) {
-        // Validate input
-        if (!username || !password) {
-            throw new Error('Username and password are required');
-        }
-
-        // Basic password validation
-        if (password.length < 6) {
-            throw new Error('Password must be at least 6 characters long');
-        }
-
-        // Hash the password
-        const hashedPassword = this.hashPassword(password);
-        
-        // Store credentials
-        localStorage.setItem('adminUsername', username);
-        localStorage.setItem('adminPasswordHash', hashedPassword);
-    },
-
-    // Validate login credentials
-    validateLogin(username, password) {
-        const storedUsername = localStorage.getItem('adminUsername');
-        const storedPasswordHash = localStorage.getItem('adminPasswordHash');
-
-        // Check if username and hashed password match
-        return username === storedUsername && 
-               this.hashPassword(password) === storedPasswordHash;
-    },
-
-    // Simple password hashing function
-    hashPassword(password) {
-        let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-            const char = password.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return hash.toString();
-    }
-};
-
-// Rest of the existing admin.js code follows...
 // JavaScript for Admin Dashboard
 document.addEventListener('DOMContentLoaded', function() {
     // Admin Authentication Elements
@@ -115,37 +63,25 @@ document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
     
     // Admin Login Form Submission
-    // Admin Login Form Submission
-if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        try {
-            // Validate login
-            if (AdminAuth.validateLogin(username, password)) {
-                // Set login status
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple authentication (replace with proper authentication)
+            if (username === 'admin' && password === 'password') {
+                // Store login status in session storage
                 sessionStorage.setItem('adminLoggedIn', 'true');
-                
-                // Show dashboard
-                document.getElementById('login-container').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                
-                // Record login activity (if function exists)
-                if (typeof recordActivity === 'function') {
-                    recordActivity('login', 'Admin logged in');
-                }
+                showDashboard();
+                // Record login activity
+                recordActivity('login', 'Admin logged in');
             } else {
-                // Show login error
                 loginError.textContent = 'Invalid username or password';
             }
-        } catch (error) {
-            loginError.textContent = error.message;
-        }
-    });
-}
+        });
+    }
     
     // Logout button
     if (logoutBtn) {
@@ -263,7 +199,7 @@ if (loginForm) {
                 featured: updateFeatured
             };
             
-            // Save update 
+            // Save update (mock implementation)
             saveUpdate(updateData)
                 .then(() => {
                     closeAllModals();
@@ -302,7 +238,7 @@ if (loginForm) {
                 date: thoughtDate
             };
             
-            // Save thought 
+            // Save thought (mock implementation)
             saveThought(thoughtData)
                 .then(() => {
                     closeAllModals();
@@ -438,17 +374,13 @@ if (loginForm) {
     
     // Load dashboard stats
     function loadDashboardStats() {
-        // Get updates from localStorage
-        const updates = JSON.parse(localStorage.getItem('pscUpdates') || '[]');
-        const thoughts = JSON.parse(localStorage.getItem('dailyThoughts') || '[]');
-        
         // Update counts
         if (updateCount) {
-            updateCount.textContent = updates.length;
+            updateCount.textContent = mockPscUpdates.length;
         }
         
         if (thoughtCount) {
-            thoughtCount.textContent = thoughts.length;
+            thoughtCount.textContent = mockThoughts.length;
         }
         
         // Load recent activity
@@ -508,6 +440,7 @@ if (loginForm) {
                             <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
+                    
                     // Add event listeners to buttons
                     const editBtn = updateEl.querySelector('.edit-btn');
                     const deleteBtn = updateEl.querySelector('.delete-btn');
@@ -541,76 +474,66 @@ if (loginForm) {
         // Show loading state
         adminThoughtsList.innerHTML = '<div class="loading">Loading thoughts...</div>';
         
-        // Get thoughts from localStorage
-        let thoughts = JSON.parse(localStorage.getItem('dailyThoughts') || '[]');
-        
-        // Sort thoughts by date (newest first)
-        thoughts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        // Apply search filter
-        if (currentThoughtsFilters.search) {
-            const searchTerm = currentThoughtsFilters.search.toLowerCase();
-            thoughts = thoughts.filter(thought => 
-                thought.text.toLowerCase().includes(searchTerm) || 
-                thought.author.toLowerCase().includes(searchTerm)
-            );
-        }
-        
-        // Pagination
-        const page = currentThoughtsFilters.page || 1;
-        const perPage = 10;
-        const totalPages = Math.ceil(thoughts.length / perPage);
-        const startIndex = (page - 1) * perPage;
-        const paginatedThoughts = thoughts.slice(startIndex, startIndex + perPage);
-        
-        // Clear loading state
-        adminThoughtsList.innerHTML = '';
-        
-        if (paginatedThoughts.length === 0) {
-            adminThoughtsList.innerHTML = '<div class="empty-state">No thoughts found matching your criteria</div>';
-            if (thoughtsPagination) thoughtsPagination.innerHTML = '';
-            return;
-        }
-        
-        // Render thoughts
-        paginatedThoughts.forEach(thought => {
-            const thoughtEl = document.createElement('div');
-            thoughtEl.className = 'admin-item';
-            
-            // Create thought item content
-            thoughtEl.innerHTML = `
-                <div class="admin-item-content">
-                    <h3 class="admin-item-title">"${thought.text.substring(0, 50)}${thought.text.length > 50 ? '...' : ''}"</h3>
-                    <div class="admin-item-meta">
-                        <span><i class="fas fa-user"></i> ${thought.author}</span>
-                        <span><i class="far fa-calendar-alt"></i> ${formatDate(thought.date)}</span>
-                    </div>
-                </div>
-                <div class="admin-item-actions">
-                    <button class="action-btn edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            `;
-            
-            // Add event listeners to buttons
-            const editBtn = thoughtEl.querySelector('.edit-btn');
-            const deleteBtn = thoughtEl.querySelector('.delete-btn');
-            
-            editBtn.addEventListener('click', () => {
-                openThoughtModal(thought);
+        // Get thoughts with current filters (mock implementation)
+        getThoughts({
+            search: currentThoughtsFilters.search,
+            page: currentThoughtsFilters.page,
+            perPage: 10
+        })
+            .then(response => {
+                if (response.thoughts.length === 0) {
+                    adminThoughtsList.innerHTML = '<div class="empty-state">No thoughts found matching your criteria</div>';
+                    if (thoughtsPagination) thoughtsPagination.innerHTML = '';
+                    return;
+                }
+                
+                // Clear loading state
+                adminThoughtsList.innerHTML = '';
+                
+                // Render thoughts
+                response.thoughts.forEach(thought => {
+                    const thoughtEl = document.createElement('div');
+                    thoughtEl.className = 'admin-item';
+                    
+                    // Create thought item content
+                    thoughtEl.innerHTML = `
+                        <div class="admin-item-content">
+                            <h3 class="admin-item-title">"${thought.text.substring(0, 50)}${thought.text.length > 50 ? '...' : ''}"</h3>
+                            <div class="admin-item-meta">
+                                <span><i class="fas fa-user"></i> ${thought.author}</span>
+                                <span><i class="far fa-calendar-alt"></i> ${formatDate(thought.date)}</span>
+                            </div>
+                        </div>
+                        <div class="admin-item-actions">
+                            <button class="action-btn edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
+                    
+                    // Add event listeners to buttons
+                    const editBtn = thoughtEl.querySelector('.edit-btn');
+                    const deleteBtn = thoughtEl.querySelector('.delete-btn');
+                    
+                    editBtn.addEventListener('click', () => {
+                        openThoughtModal(thought);
+                    });
+                    
+                    deleteBtn.addEventListener('click', () => {
+                        openDeleteModal('thought', thought.id, thought.text.substring(0, 30) + '...');
+                    });
+                    
+                    adminThoughtsList.appendChild(thoughtEl);
+                });
+                
+                // Create pagination
+                if (thoughtsPagination) {
+                    createAdminPagination(thoughtsPagination, response.totalPages, response.currentPage, 'thoughts');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading admin thoughts:', error);
+                adminThoughtsList.innerHTML = '<div class="empty-state">Failed to load thoughts</div>';
             });
-            
-            deleteBtn.addEventListener('click', () => {
-                openDeleteModal('thought', thought.id, thought.text.substring(0, 30) + '...');
-            });
-            
-            adminThoughtsList.appendChild(thoughtEl);
-        });
-        
-        // Create pagination
-        if (thoughtsPagination) {
-            createAdminPagination(thoughtsPagination, totalPages, page, 'thoughts');
-        }
     }
     
     // Create pagination for admin lists
@@ -828,91 +751,117 @@ if (loginForm) {
         currentDeleteItem = null;
     }
     
-    // Add helper functions for saving and deleting
-    function saveThought(thoughtData) {
-        return new Promise((resolve) => {
-            // Get existing thoughts from localStorage
-            let thoughts = JSON.parse(localStorage.getItem('dailyThoughts') || '[]');
-            
-            // Maximum thoughts limit
-            const MAX_THOUGHTS = 50;
-            
-            // Find if thought exists
-            const existingIndex = thoughts.findIndex(thought => thought.id === thoughtData.id);
-            
-            if (existingIndex !== -1) {
-                // Update existing thought
-                thoughts[existingIndex] = thoughtData;
-            } else {
-                // Add new thought
-                thoughts.push(thoughtData);
-            }
-            
-            // Sort thoughts by date (newest first)
-            thoughts.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Remove excess thoughts if over MAX_THOUGHTS
-            if (thoughts.length > MAX_THOUGHTS) {
-                thoughts = thoughts.slice(0, MAX_THOUGHTS);
-            }
-            
-            // Save back to localStorage
-            localStorage.setItem('dailyThoughts', JSON.stringify(thoughts));
-            
-            resolve(thoughtData);
-        });
-    }
-    
-    function deleteUpdate(id) {
-        return new Promise((resolve) => {
-            // Get existing updates from localStorage
-            let updates = JSON.parse(localStorage.getItem('pscUpdates') || '[]');
-            
-            // Remove the update with the specified id
-            updates = updates.filter(update => update.id !== id);
-            
-            // Save back to localStorage
-            localStorage.setItem('pscUpdates', JSON.stringify(updates));
-            
-            resolve();
-        });
-    }
-    
-    function deleteThought(id) {
-        return new Promise((resolve) => {
-            // Get existing thoughts from localStorage
-            let thoughts = JSON.parse(localStorage.getItem('dailyThoughts') || '[]');
-            
-            // Remove the thought with the specified id
-            thoughts = thoughts.filter(thought => thought.id !== id);
-            
-            // Save back to localStorage
-            localStorage.setItem('dailyThoughts', JSON.stringify(thoughts));
-            
-            resolve();
-        });
-    }
-    
     // Record activity (mock implementation)
     function recordActivity(type, message) {
         // In a real application, this would save to a database
         console.log(`Activity recorded: [${type}] ${message}`);
     }
     
-    // Utility functions (from app.js)
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
+    // Mock API functions (will be replaced with actual API calls)
+    
+    // Get thoughts with filters
+    function getThoughts(options = {}) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                let filteredThoughts = [...mockThoughts];
+                
+                // Filter by search term
+                if (options.search) {
+                    const searchTerm = options.search.toLowerCase();
+                    filteredThoughts = filteredThoughts.filter(thought => 
+                        thought.text.toLowerCase().includes(searchTerm) || 
+                        thought.author.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Sort by date (newest first)
+                filteredThoughts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Pagination
+                const page = options.page || 1;
+                const perPage = options.perPage || 10;
+                const totalPages = Math.ceil(filteredThoughts.length / perPage);
+                const paginatedThoughts = filteredThoughts.slice((page - 1) * perPage, page * perPage);
+                
+                resolve({
+                    thoughts: paginatedThoughts,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    totalThoughts: filteredThoughts.length
+                });
+            }, 500); // Simulate network delay
+        });
     }
     
-    function getCategoryLabel(category) {
-        const labels = {
-            'notification': 'Notification',
-            'exam': 'Exam Update',
-            'result': 'Result',
-            'appointment': 'Appointment',
-            'other': 'Other'
-        };
-        return labels[category] || 'Other';
+    // Save update (mock implementation)
+    function saveUpdate(updateData) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Find if update exists
+                const existingIndex = mockPscUpdates.findIndex(update => update.id === updateData.id);
+                
+                if (existingIndex !== -1) {
+                    // Update existing
+                    mockPscUpdates[existingIndex] = updateData;
+                } else {
+                    // Add new
+                    mockPscUpdates.push(updateData);
+                }
+                
+                resolve(updateData);
+            }, 500); // Simulate network delay
+        });
+    }
+    
+    // Save thought (mock implementation)
+    function saveThought(thoughtData) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Find if thought exists
+                const existingIndex = mockThoughts.findIndex(thought => thought.id === thoughtData.id);
+                
+                if (existingIndex !== -1) {
+                    // Update existing
+                    mockThoughts[existingIndex] = thoughtData;
+                } else {
+                    // Add new
+                    mockThoughts.push(thoughtData);
+                }
+                
+                resolve(thoughtData);
+            }, 500); // Simulate network delay
+        });
+    }
+    
+    // Delete update (mock implementation)
+    function deleteUpdate(id) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Remove update from array
+                const index = mockPscUpdates.findIndex(update => update.id === id);
+                
+                if (index !== -1) {
+                    mockPscUpdates.splice(index, 1);
+                }
+                
+                resolve();
+            }, 500); // Simulate network delay
+        });
+    }
+    
+    // Delete thought (mock implementation)
+    function deleteThought(id) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Remove thought from array
+                const index = mockThoughts.findIndex(thought => thought.id === id);
+                
+                if (index !== -1) {
+                    mockThoughts.splice(index, 1);
+                }
+                
+                resolve();
+            }, 500); // Simulate network delay
+        });
     }
 });
