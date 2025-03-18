@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WindowEdu PSC Hub</title>
+    <meta name="description" content="Latest PSC updates, inspiring thoughts, and quick access to WindowEdu's resources">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <meta name="theme-color" content="#3498db">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="images/logo.png" alt="WindowEdu Logo" class="logo">
+            <h1>WindowEdu PSC Hub</h1>
+        </div>
+        <nav id="main-nav">
+            <button id="menu-toggle" aria-label="Toggle menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul id="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="psc-updates.html">PSC Updates</a></li>
+                <li><a href="https://app.windowedu.in/" target="_blank">WindowEdu App</a></li>
+                <li><a href="https://windowedu.in/MY-PSC-AI-Mentor" target="_blank">MyPSC AI Mentor</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Your Gateway to PSC Success</h2>
+                <p>Stay updated with latest PSC notifications, resources, and insights</p>
+                <a href="psc-updates.html" class="btn primary-btn">View Latest Updates</a>
+                <a href="https://app.windowedu.in/" target="_blank" class="btn secondary-btn">Download App</a>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="card thought-card">
+                <h2><i class="fas fa-lightbulb"></i> Thought of the Day</h2>
+                <div id="thought-container">
+                    <blockquote id="thought-content">
+                        "Success is not final, failure is not fatal: It is the courage to continue that counts."
+                    </blockquote>
+                    <p id="thought-author">- Winston Churchill</p>
+                </div>
+            </div>
+
+            <div class="card updates-card">
+                <h2><i class="fas fa-bell"></i> Important PSC Updates</h2>
+                <div id="updates-container">
+                    <div class="loading">Loading updates...</div>
+                </div>
+                <a href="psc-updates.html" class="btn secondary-btn btn-small">View All Updates</a>
+            </div>
+        </section>
+
+        <section class="quick-links container">
+            <h2><i class="fas fa-link"></i> Quick Links</h2>
+            <div class="links-grid">
+                <a href="https://t.me/windowedu" target="_blank" class="link-card">
+                    <i class="fab fa-telegram"></i>
+                    <span>Join Telegram Community</span>
+                </a>
+                <a href="https://www.youtube.com/c/Windowedu1" target="_blank" class="link-card">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube Channel</span>
+                </a>
+                <a href="https://www.instagram.com/windowedu/" target="_blank" class="link-card">
+                    <i class="fab fa-instagram"></i>
+                    <span>Follow on Instagram</span>
+                </a>
+                <a href="https://app.windowedu.in/" target="_blank" class="link-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Download App</span>
+                </a>
+                <a href="https://windowedu.in/MY-PSC-AI-Mentor" target="_blank" class="link-card">
+                    <i class="fas fa-robot"></i>
+                    <span>MyPSC AI Mentor</span>
+                </a>
+                <a href="#" class="link-card" id="install-app">
+                    <i class="fas fa-download"></i>
+                    <span>Install App</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content container">
+            <div class="footer-logo">
+                <img src="images/logo.png" alt="WindowEdu Logo" class="logo-small">
+                <p>WindowEdu PSC Hub</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="psc-updates.html">PSC Updates</a></li>
+                    <li><a href="https://app.windowedu.in/">Download App</a></li>
+                    <li><a href="https://windowedu.in/MY-PSC-AI-Mentor">MyPSC AI Mentor</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h3>Connect With Us</h3>
+                <div class="social-icons">
+                    <a href="https://t.me/windowedu" target="_blank"><i class="fab fa-telegram"></i></a>
+                    <a href="https://www.youtube.com/c/Windowedu1" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/windowedu/" target="_blank"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 WindowEdu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
