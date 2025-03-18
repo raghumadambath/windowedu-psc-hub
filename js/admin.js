@@ -1,3 +1,55 @@
+// AdminAuth Utility for Cross-Browser Authentication
+const AdminAuth = {
+    // Initialize default admin credentials if not set
+    initializeAdmin() {
+        if (!localStorage.getItem('adminUsername')) {
+            this.setAdminCredentials('admin', 'password');
+        }
+    },
+
+    // Securely set admin credentials with basic hashing
+    setAdminCredentials(username, password) {
+        // Validate input
+        if (!username || !password) {
+            throw new Error('Username and password are required');
+        }
+
+        // Basic password validation
+        if (password.length < 6) {
+            throw new Error('Password must be at least 6 characters long');
+        }
+
+        // Hash the password
+        const hashedPassword = this.hashPassword(password);
+        
+        // Store credentials
+        localStorage.setItem('adminUsername', username);
+        localStorage.setItem('adminPasswordHash', hashedPassword);
+    },
+
+    // Validate login credentials
+    validateLogin(username, password) {
+        const storedUsername = localStorage.getItem('adminUsername');
+        const storedPasswordHash = localStorage.getItem('adminPasswordHash');
+
+        // Check if username and hashed password match
+        return username === storedUsername && 
+               this.hashPassword(password) === storedPasswordHash;
+    },
+
+    // Simple password hashing function
+    hashPassword(password) {
+        let hash = 0;
+        for (let i = 0; i < password.length; i++) {
+            const char = password.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return hash.toString();
+    }
+};
+
+// Rest of the existing admin.js code follows...
 // JavaScript for Admin Dashboard
 document.addEventListener('DOMContentLoaded', function() {
     // Admin Authentication Elements
